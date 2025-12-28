@@ -28,21 +28,6 @@ Speech-to-Text: Vosk Telugu Model (Offline)
 AI Brain: Gemini 2.5 Flash
 Text-to-Speech: Gemini TTS
 
-📂 Project Structure
-telugu-hyd-voice-assistant/
-│
-├── app.py
-├── services/
-│   ├── stt.py
-│   ├── llm.py
-│   └── tts.py
-├── templates/
-│   └── index.html
-├── models/
-├── audio/
-├── requirements.txt
-├── .env
-└── README.md
 
 🔊 Telugu Speech Model Setup
 
@@ -68,3 +53,4 @@ python app.py
 Open in browser:
 
 http://127.0.0.1:5000
+

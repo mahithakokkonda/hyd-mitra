@@ -54,3 +54,8 @@ Open in browser:
 
 http://127.0.0.1:5000
 
+Screenshots
+<img width="1863" height="953" alt="image" src="https://github.com/user-attachments/assets/263e68da-549b-444c-af05-03d44e3aa86b" />
+<img width="1586" height="974" alt="image" src="https://github.com/user-attachments/assets/d03af5dd-d9fe-4104-82be-60c984977780" />
+
+

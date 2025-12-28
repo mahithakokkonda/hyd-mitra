@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>HYD-MITRA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            margin: 0;
+            background: #fffaf3;
+            font-family: Poppins;
+            display: flex;
+            justify-content: center;
+        }
+
+        .app {
+            width: 430px;
+            min-height: 100vh;
+            background: #fffdf8;
+            padding: 30px 20px 140px;
+        }
+
+        .logo {
+            text-align: center;
+        }
+
+        .pin {
+            width: 56px;
+            height: 56px;
+            border-radius: 14px;
+            background: #f4a41c;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin: auto;
+        }
+
+        .logo h1 {
+            margin: 12px 0 0;
+            color: #9d2a2a;
+        }
+
+        .logo p {
+            margin: 2px 0;
+            color: #444;
+            font-size: 14px;
+        }
+
+        .logo span {
+            color: #f4a41c;
+            font-size: 14px;
+        }
+
+        .chat {
+            margin-top: 25px;
+        }
+
+        .bubble {
+            padding: 16px;
+            margin: 14px 0;
+            border-radius: 16px;
+            font-size: 14px;
+        }
+
+        .user {
+            background: #f4a41c;
+            color: #000;
+        }
+
+        .bot {
+            background: #fff;
+            border: 1px solid #ddd;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px;
+            border-radius: 30px;
+            border: 1px solid #f4a41c;
+            font-size: 14px;
+        }
+
+        .controls {
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        button.small {
+            padding: 10px 20px;
+            border-radius: 20px;
+            border: none;
+            background: #9d2a2a;
+            color: #fff;
+            margin: 4px;
+        }
+
+        .mic-zone {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 40px 0 20px;
+        }
+
+        .mic-glow {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(244, 164, 28, .35), rgba(244, 164, 28, .05));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: pulse 1.8s infinite;
+        }
+
+        .mic-core {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: #f4a41c;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 34px;
+            color: white;
+        }
+
+        .status-pill {
+            margin-top: 12px;
+            display: none;
+            background: white;
+            padding: 6px 18px;
+            border-radius: 30px;
+            color: #1aa55b;
+            font-size: 12px;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, .1);
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                opacity: .7
+            }
+
+            50% {
+                transform: scale(1.2);
+                opacity: 1
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: .7
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="app">
+        <div class="logo">
+            <div class="pin">📍</div>
+            <h1>HYD-MITRA</h1>
+            <p>Your Hyderabad Local <b>Telugu</b> Voice Assistant</p>
+            <span>మీ హైదరాబాద్ స్థానిక మిత్రుడు</span>
+        </div>
+
+        <div class="chat" id="chat"></div>
+        <input id="text" placeholder="Type your Hyderabad question...">
+        <div class="controls">
+            <button class="small" onclick="sendText()">Send</button>
+            <button class="small" onclick="clearChat()">Clear</button>
+        </div>
+        <div class="mic-zone">
+            <div class="mic-glow" id="glow">
+                <div class="mic-core" id="mic">🎤</div>
+            </div>
+            <div class="status-pill" id="status"></div>
+        </div>
+
+    </div>
+
+
+    <audio id="player"></audio>
+
+    <script>
+        const chat = document.getElementById("chat");
+        const mic = document.getElementById("mic");
+        const glow = document.getElementById("glow");
+        const status = document.getElementById("status");
+        const player = document.getElementById("player");
+
+        function add(text, cls) {
+            let d = document.createElement("div");
+            d.className = "bubble " + cls;
+            d.innerText = text;
+            chat.appendChild(d);
+            chat.scrollTop = chat.scrollHeight;
+        }
+        function clearChat() { chat.innerHTML = ""; }
+
+        async function sendText() {
+            let t = text.value;
+            if (!t) return;
+            add("🗣️ " + t, "user"); text.value = "";
+            let r = await fetch("/askText", { method: "POST", headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text: t }) });
+            let d = await r.json();
+            add("🤖 " + d.ai, "bot");
+            player.src = d.audio + "?t=" + Date.now(); player.play();
+        }
+
+        mic.onclick = async () => {
+            status.style.display = "inline-block";
+            status.innerText = "Listening...";
+
+            const s = await navigator.mediaDevices.getUserMedia({ audio: true });
+            const r = new MediaRecorder(s, { mimeType: "audio/webm" });
+            let c = []; r.start(); setTimeout(() => r.stop(), 5000);
+            r.ondataavailable = e => c.push(e.data);
+
+            r.onstop = async () => {
+                status.innerText = "Thinking...";
+                const f = new FormData();
+                f.append("audio", new Blob(c, { type: "audio/webm" }), "voice.webm");
+                const res = await fetch("/ask", { method: "POST", body: f });
+                const d = await res.json();
+
+                status.innerText = "Speaking...";
+                add("🗣️ " + d.user, "user");
+                add("🤖 " + d.ai, "bot");
+                player.src = d.audio + "?t=" + Date.now(); player.play();
+
+                player.onended = () => { status.style.display = "none"; }
+            }
+        }
+    </script>
+</body>
+
+</html>
